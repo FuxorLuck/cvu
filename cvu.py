@@ -27,7 +27,7 @@ if not os.path.exists(INSTALL_DIR):
     os.mkdir(INSTALL_DIR)
 else:
     enabled = list(
-        filter(lambda n: not n.endswith('-disabled'), os.listdir(INSTALL_DIR)))
+        filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(INSTALL_DIR)))
 
     if len(enabled) == 1:
         installed = re.match(pattern='citra-valentin-windows-(.*)',
