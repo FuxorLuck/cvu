@@ -17,7 +17,8 @@ import tqdm
 if sys.platform != 'win32':
     raise NotImplementedError('Only Windows is supported')
 
-INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(os.getenv('LOCALAPPDATA'), 'citra-valentin'))
+INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
+    os.getenv('LOCALAPPDATA'), 'citra-valentin'))
 
 print(f'Installation directory: {INSTALL_DIR}')
 
@@ -76,6 +77,7 @@ if installed != latest:
 else:
     print('You have the latest version.')
 
-print('Starting...')
-subprocess.Popen(os.path.join(
-    INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe'))
+args = [os.path.join(
+    INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+print(f'Starting {" ".join(args)}...')
+subprocess.Popen(args)
