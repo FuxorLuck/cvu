@@ -2,6 +2,7 @@
 # Licensed under GPLv2 or any later version
 # Refer to the license.txt file included.
 
+import json
 import io
 import os
 import re
@@ -9,9 +10,8 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import urllib3
 
-import github
-import requests
 import tqdm
 
 if sys.platform != 'win32':
@@ -42,20 +42,23 @@ else:
         print('Multiple enabled versions found. add -disabled to the other versions.')
         sys.exit(0)
 
-latest = github.Github().get_repo(
-    'vvanelslande/citra').get_latest_release().tag_name
+http = urllib3.PoolManager()
 
-if installed != latest:
+r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases/latest',
+                 headers={'user-agent': f'Citra Valentin Updater on {sys.platform}'})
+latest = json.loads(r.data.decode('utf8'))['tag_name']
+
+if True:  # installed != latest:
     print(f'Installing {latest}...')
 
-    r = requests.get(
-        f'https://github.com/vvanelslande/citra/releases/download/{latest}/citra-valentin-windows-{latest}.tar.gz', stream=True)
+    r = http.request('GET', f'https://github.com/vvanelslande/citra/releases/download/{latest}/citra-valentin-windows-{latest}.tar.gz', headers={
+        'user-agent': f'Citra Valentin Updater on {sys.platform}'}, preload_content=False)
 
-    size = int(r.headers.get('content-length'))
+    size = int(r.headers['content-length'])
     t = tqdm.tqdm(total=size, unit='B', unit_scale=True)
     tgz = io.BytesIO()
 
-    for data in r.iter_content(chunk_size=1024):
+    for data in r:
         t.update(len(data))
         tgz.write(data)
 
