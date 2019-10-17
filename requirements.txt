@@ -1,2 +1,4 @@
-tqdm==4.36.1
 urllib3==1.25.6
+pypresence==3.3.2
+tqdm==4.36.1
+pypiwin32==223
