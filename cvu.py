@@ -2,17 +2,17 @@
 # Licensed under GPLv2 or any later version
 # Refer to the license.txt file included.
 
-import json
 import io
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
 import tarfile
-import urllib3
 
 import tqdm
+import urllib3
 
 if sys.platform != 'win32':
     raise NotImplementedError('Only Windows is supported')
@@ -48,7 +48,7 @@ r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/release
                  headers={'user-agent': f'Citra Valentin Updater on {sys.platform}'})
 latest = json.loads(r.data.decode('utf8'))['tag_name']
 
-if True:  # installed != latest:
+if installed != latest:
     print(f'Installing {latest}...')
 
     r = http.request('GET', f'https://github.com/vvanelslande/citra/releases/download/{latest}/citra-valentin-windows-{latest}.tar.gz', headers={
