@@ -17,6 +17,8 @@ import urllib3
 
 import discord_rpc
 
+FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
+
 
 def main():
     INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
@@ -46,14 +48,32 @@ def main():
 
     http = urllib3.PoolManager()
 
-    r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases/latest',
+    r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases',
                      headers={'user-agent': f'Citra Valentin updater on {sys.platform}'})
-    latest = json.loads(r.data.decode('utf8'))['tag_name']
+    releases = json.loads(r.data.decode('utf8'))
+    latest = None
+    tgz_url = None
+
+    for release in releases:
+        if latest is not None:
+            break
+
+        for asset in release['assets']:
+            match = re.match(pattern=FILE_NAME_PATTERN, string=asset['name'])
+
+            if match is not None:
+                latest = match.group(1)
+                tgz_url = asset['browser_download_url']
+
+                print(
+                    f'Latest version: {latest} (tag name: {release["tag_name"]})')
+
+                break
 
     if installed != latest:
         print(f'Installing {latest}...')
 
-        r = http.request('GET', f'https://github.com/vvanelslande/citra/releases/download/{latest}/citra-valentin-windows-{latest}.tar.gz', headers={
+        r = http.request('GET', tgz_url, headers={
             'user-agent': f'Citra Valentin updater on {sys.platform}'}, preload_content=False)
 
         size = int(r.headers['content-length'])
