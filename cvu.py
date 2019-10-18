@@ -114,7 +114,7 @@ def main():
 
     try:
         discord_rpc.connect()
-    except pypresence.exceptions.InvalidPipe:
+    except (pypresence.exceptions.InvalidPipe, pypresence.exceptions.InvalidID):
         print('Discord not running.')
 
         while True:
