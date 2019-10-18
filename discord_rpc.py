@@ -1,3 +1,7 @@
+# Copyright (C) 2019 Valentin Vanelslande
+# Licensed under GPLv2 or any later version
+# Refer to the license.txt file included.
+
 import time
 from ctypes import windll
 
