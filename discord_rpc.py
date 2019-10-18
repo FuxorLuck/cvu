@@ -19,10 +19,8 @@ def parse_title(text):
         return ('unknown version', None)
     elif len(parts) == 1:
         return (parts[0], None)
-    elif len(parts) == 2:
+    elif len(parts) >= 2:
         return (parts[0], parts[1])
-    else:
-        raise NotImplementedError(f'len(parts) == {len(parts)}')
 
 
 def enum_callback(hwnd, unknown):
