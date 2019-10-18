@@ -55,6 +55,8 @@ def enum_callback(hwnd, unknown):
                                state='Idling' if game is None else 'In-game', details=game, start=start)
 
                     old_text = text
+
+                time.sleep(1)
         finally:
             cv_closed = True
 
