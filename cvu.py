@@ -11,11 +11,8 @@ import subprocess
 import sys
 import tarfile
 
-import pypresence
 import tqdm
 import urllib3
-
-import discord_rpc
 
 FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
 
@@ -110,22 +107,7 @@ def main():
         INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
     print(f'Starting {" ".join(args)}...')
 
-    cv = subprocess.Popen(args)
-
-    try:
-        discord_rpc.connect()
-    except (pypresence.exceptions.InvalidPipe, pypresence.exceptions.InvalidID):
-        print('Discord not running.')
-
-        while True:
-            try:
-                cv.wait(0.5)
-
-                break
-            except subprocess.TimeoutExpired:
-                pass
-    finally:
-        cv.terminate()
+    subprocess.call(args)
 
 
 if __name__ == '__main__':
