@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Citra Valentin Updater"
-#define MyAppVersion "c020e40"
+#define MyAppVersion "86b36a9"
 #define MyAppPublisher "Valentin Vanelslande"
 #define MyAppURL "https://github.com/vvanelslande/cvu"
 #define MyAppExeName "cvu.exe"
