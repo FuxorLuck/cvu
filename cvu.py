@@ -105,9 +105,8 @@ def main():
 
     args = [os.path.join(
         INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
-    print(f'Starting {" ".join(args)}...')
 
-    subprocess.call(args)
+    subprocess.Popen(args)
 
 
 if __name__ == '__main__':
