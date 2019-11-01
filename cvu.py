@@ -10,6 +10,10 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import tkinter
+import traceback
+import urllib
+import webbrowser
 
 import tqdm
 import urllib3
@@ -43,70 +47,111 @@ def main():
             print('Multiple enabled versions found. add -disabled to the other versions.')
             return
 
-    http = urllib3.PoolManager()
+    try:
+        http = urllib3.PoolManager()
 
-    r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases',
-                     headers={'user-agent': f'Citra Valentin updater on {sys.platform}'})
-    releases = json.loads(r.data.decode('utf8'))
-    latest = None
-    tgz_url = None
+        r = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases',
+                         headers={'user-agent': f'Citra Valentin updater on {sys.platform}'})
+        releases = json.loads(r.data.decode('utf8'))
+        latest = None
+        tgz_url = None
 
-    for release in releases:
-        if latest is not None:
-            break
-
-        for asset in release['assets']:
-            match = re.match(pattern=FILE_NAME_PATTERN, string=asset['name'])
-
-            if match is not None:
-                latest = match.group(1)
-                tgz_url = asset['browser_download_url']
-
-                print(
-                    f'Latest version: {latest} (tag name: {release["tag_name"]})')
-
+        for release in releases:
+            if latest is not None:
                 break
 
-    if installed != latest:
-        print(f'Installing {latest}...')
+            for asset in release['assets']:
+                match = re.match(pattern=FILE_NAME_PATTERN,
+                                 string=asset['name'])
 
-        r = http.request('GET', tgz_url, headers={
-            'user-agent': f'Citra Valentin updater on {sys.platform}'}, preload_content=False)
+                if match is not None:
+                    latest = match.group(1)
+                    tgz_url = asset['browser_download_url']
 
-        size = int(r.headers['content-length'])
-        t = tqdm.tqdm(total=size, unit='B', unit_scale=True)
-        tgz = io.BytesIO()
+                    print(
+                        f'Latest version: {latest} (tag name: {release["tag_name"]})')
 
-        for data in r:
-            t.update(len(data))
-            tgz.write(data)
+                    break
 
-        t.close()
+        if installed != latest:
+            print(f'Installing {latest}...')
 
-        tgz.seek(0)
-        tar = tarfile.open(fileobj=tgz, mode='r:gz')
-        if installed != None:
-            disabled = os.path.join(
-                INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
-            if os.path.exists(disabled):
-                print(
-                    f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.')
-                shutil.rmtree(disabled)
-            os.rename(os.path.join(
-                INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
-            print(f'{installed} was disabled (-disabled suffix added)')
-            if os.path.isdir(os.path.join(disabled, 'user')):
-                shutil.copytree(os.path.join(disabled, 'user'), os.path.join(
-                    INSTALL_DIR, f'citra-valentin-windows-{latest}', 'user'))
-                print(f'user directory from {installed} copied to {latest}')
-        tar.extractall(INSTALL_DIR)
-    else:
-        print('You have the latest version.')
+            r = http.request('GET', tgz_url, headers={
+                'user-agent': f'Citra Valentin updater on {sys.platform}'}, preload_content=False)
 
-    args = [os.path.join(
-        INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+            size = int(r.headers['content-length'])
+            t = tqdm.tqdm(total=size, unit='B', unit_scale=True)
+            tgz = io.BytesIO()
 
-    subprocess.Popen(args)
+            for data in r:
+                t.update(len(data))
+                tgz.write(data)
+
+            t.close()
+
+            tgz.seek(0)
+            tar = tarfile.open(fileobj=tgz, mode='r:gz')
+            if installed != None:
+                disabled = os.path.join(
+                    INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
+                if os.path.exists(disabled):
+                    print(
+                        f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.')
+                    shutil.rmtree(disabled)
+                os.rename(os.path.join(
+                    INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
+                print(f'{installed} was disabled (-disabled suffix added)')
+                if os.path.isdir(os.path.join(disabled, 'user')):
+                    shutil.copytree(os.path.join(disabled, 'user'), os.path.join(
+                        INSTALL_DIR, f'citra-valentin-windows-{latest}', 'user'))
+                    print(
+                        f'user directory from {installed} copied to {latest}')
+            tar.extractall(INSTALL_DIR)
+        else:
+            print('You have the latest version.')
+
+        args = [os.path.join(
+            INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+
+        subprocess.Popen(args)
+    except Exception as exception:
+        if installed is not None:
+            args = [os.path.join(
+                INSTALL_DIR, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+
+            subprocess.Popen(args)
+
+        window = tkinter.Tk()
+        window.title('cvu')
+        window.state('zoomed')
+        tkinter.Label(window, text='Something happened').pack()
+        tkinter.Label(window, text='Traceback:').pack()
+        tb = traceback.format_exc()
+        text = tkinter.Text(window)
+        text.insert(tkinter.END, tb)
+        text.config(state=tkinter.DISABLED)
+        text.pack(fill=tkinter.BOTH, expand=tkinter.YES)
+
+        def copy_traceback():
+            window.clipboard_clear()
+            window.clipboard_append(tb)
+
+        def new_github_issue():
+            q = urllib.parse.urlencode({
+                'title': type(exception).__name__,
+                'body': f'Issue generated by cvu.\n\n```\n{tb}```'
+            })
+            webbrowser.open(
+                f'https://github.com/vvanelslande/cvu/issues/new?{q}')
+            window.quit()
+
+        buttons = tkinter.Frame(window)
+        tkinter.Button(buttons, text='Copy Traceback',
+                       command=copy_traceback).pack(side=tkinter.LEFT)
+        tkinter.Button(buttons, text='New GitHub Issue',
+                       command=new_github_issue).pack(side=tkinter.LEFT)
+        buttons.pack(side=tkinter.BOTTOM)
+        window.mainloop()
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Citra Valentin Updater"
-#define MyAppVersion "38d8458"
+#define MyAppVersion "TODO"
 #define MyAppPublisher "Valentin Vanelslande"
 #define MyAppURL "https://github.com/vvanelslande/cvu"
 #define MyAppExeName "cvu.exe"
@@ -53,7 +53,6 @@ Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName:"CVU_INSTALL_DIR
 [Code]
 var
   Page: TInputDirWizardPage;
-  InstallDir: string;
 
 #ifdef UNICODE
   #define AW "W"
