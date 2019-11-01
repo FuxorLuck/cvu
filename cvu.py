@@ -43,8 +43,10 @@ def main():
         elif len(enabled) == 0:
             print('No installed and enabled version found.')
         else:
-            subprocess.Popen(['explorer.exe', INSTALL_DIR])
-            print('Multiple enabled versions found. add -disabled to the other versions.')
+            subprocess.call(['explorer.exe', INSTALL_DIR])
+            print(
+                'Multiple enabled versions found. You can disable versions by adding -disabled to the names.')
+            input()
             return
 
     try:
