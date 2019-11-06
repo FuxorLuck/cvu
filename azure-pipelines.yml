@@ -41,5 +41,6 @@ steps:
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
       tag: '$(Build.SourceVersion)'
+      assets: 'Output/*'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
