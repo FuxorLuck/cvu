@@ -11,6 +11,14 @@ steps:
       pip install -r requirements.txt
       pip install PyInstaller
     displayName: 'Install dependencies'
+  - script: |
+      pip install pylint
+      pylint **/*.py
+    displayName: 'Pylint'
+  - script: |
+      pip install pycodestyle
+      pycodestyle **/*.py
+    displayName: 'pycodestyle'
   - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
     displayName: 'Generate exe file'
   - task: CopyFiles@2
