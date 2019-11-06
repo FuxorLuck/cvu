@@ -18,7 +18,9 @@ steps:
       SourceFolder: '.'
       Contents: 'license.txt'
       TargetFolder: 'dist'
-  - script: iscc /dMyAppVersion cvu.iss
+  - powershell: |
+      $CvuVersion = git log --pretty=format:'%h' -n 1
+      iscc /dMyAppVersion="$CvuVersion" cvu.iss
     displayName: 'Generate setup'
   - task: ArchiveFiles@2
     inputs:
