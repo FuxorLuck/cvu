@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Citra Valentin Updater"
-#define MyAppVersion "8d026da"
+; MyAppVersion defined by iscc.
 #define MyAppPublisher "Valentin Vanelslande"
 #define MyAppURL "https://github.com/vvanelslande/cvu"
 #define MyAppExeName "cvu.exe"
@@ -20,13 +20,13 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\cvu
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\Usuario\cvu\license.txt
+LicenseFile=license.txt
 PrivilegesRequired=lowest
 OutputBaseFilename=cvu_setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-SetupIconFile=C:\Users\Usuario\citra\dist\citra.ico
+SetupIconFile=citra.ico
 ChangesEnvironment=yes
 ArchitecturesInstallIn64BitMode=x64
 
@@ -37,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Usuario\cvu\dist\cvu.exe"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: SetInstallDir
+Source: "dist\cvu.exe"; DestDir: "{app}"; Flags: ignoreversion; AfterInstall: SetInstallDir
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
