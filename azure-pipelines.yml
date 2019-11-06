@@ -9,6 +9,7 @@ steps:
   - script: |
       python -m pip install --upgrade pip
       pip install -r requirements.txt
+      pip install PyInstaller
     displayName: 'Install dependencies'
   - script: python -m PyInstaller --onefile --icon citra.ico
     displayName: 'Generate exe file'
