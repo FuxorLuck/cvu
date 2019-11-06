@@ -11,11 +11,11 @@ steps:
       pip install -r requirements.txt
       pip install PyInstaller pylint pycodestyle
     displayName: 'Install dependencies'
-  - script: |
-      pylint *.py
+  - powershell: |
+      Get-ChildItem -Path ** -Recurse *.py | foreach { pylint $_.FullName }
     displayName: 'Pylint'
   - script: |
-      pycodestyle *.py
+      pycodestyle .
     displayName: 'pycodestyle'
   - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
     displayName: 'Generate exe file'
