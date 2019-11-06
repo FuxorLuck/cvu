@@ -35,8 +35,8 @@ steps:
       publishLocation: 'pipeline'
   - task: GitHubRelease@1
     inputs:
-      gitHubConnection: 'Releases'
-      repositoryName: 'vvanelslande/releases'
+      gitHubConnection: 'GitHub Releases'
+      repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
       tagSource: 'userSpecifiedTag'
