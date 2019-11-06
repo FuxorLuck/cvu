@@ -11,7 +11,7 @@ steps:
       pip install -r requirements.txt
       pip install PyInstaller
     displayName: 'Install dependencies'
-  - script: python -m PyInstaller --onefile --icon citra.ico
+  - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
     displayName: 'Generate exe file'
   - task: CopyFiles@2
     inputs:
