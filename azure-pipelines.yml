@@ -32,12 +32,12 @@ steps:
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.ArtifactStagingDirectory)/cvu.zip'
-      artifact: 'artifacts'
+      artifact: 'zip'
       publishLocation: 'pipeline'
     displayName: 'Publish zip'
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: 'Output'
-      artifact: 'artifacts'
+      artifact: 'setup'
       publishLocation: 'pipeline'
     displayName: 'Publish setup'
