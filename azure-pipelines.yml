@@ -19,25 +19,27 @@ steps:
       Contents: 'license.txt'
       TargetFolder: 'dist'
   - powershell: |
-      $CvuVersion = git log --pretty=format:'%h' -n 1
-      iscc /dMyAppVersion="$CvuVersion" cvu.iss
+      iscc /dMyAppVersion="$(Build.SourceVersion)" cvu.iss
     displayName: 'Generate setup'
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: 'dist'
       includeRootFolder: false
       archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/cvu.zip'
+      archiveFile: 'Output/cvu.zip'
       replaceExistingArchive: true
   - task: PublishPipelineArtifact@1
     inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)/cvu.zip'
-      artifact: 'zip'
-      publishLocation: 'pipeline'
-    displayName: 'Publish zip'
-  - task: PublishPipelineArtifact@1
-    inputs:
       targetPath: 'Output'
-      artifact: 'setup'
+      artifact: 'artifacts'
       publishLocation: 'pipeline'
-    displayName: 'Publish setup'
+  - task: GitHubRelease@1
+    inputs:
+      gitHubConnection: 'Releases'
+      repositoryName: 'vvanelslande/releases'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'userSpecifiedTag'
+      tag: '$(Build.SourceVersion)'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
