@@ -12,10 +12,10 @@ steps:
       pip install PyInstaller pylint pycodestyle
     displayName: 'Install dependencies'
   - script: |
-      pylint **/*.py
+      pylint **\*.py
     displayName: 'Pylint'
   - script: |
-      pycodestyle **/*.py
+      pycodestyle **\*.py
     displayName: 'pycodestyle'
   - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
     displayName: 'Generate exe file'
