@@ -9,14 +9,12 @@ steps:
   - script: |
       python -m pip install --upgrade pip
       pip install -r requirements.txt
-      pip install PyInstaller
+      pip install PyInstaller pylint pycodestyle
     displayName: 'Install dependencies'
   - script: |
-      pip install pylint
       pylint **/*.py
     displayName: 'Pylint'
   - script: |
-      pip install pycodestyle
       pycodestyle **/*.py
     displayName: 'pycodestyle'
   - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
