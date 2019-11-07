@@ -67,7 +67,7 @@ def get_installed_version():
 
     return installed
 
-def show_traceback(formatted_traceback):
+def show_traceback(exception, formatted_traceback):
     """Shows a traceback and options to copy it or create a GitHub issue."""
     window = tkinter.Tk()
     window.title('cvu')
@@ -177,7 +177,7 @@ def main():
 
             subprocess.Popen(args)
 
-        show_traceback(traceback.format_exc())
+        show_traceback(exception, traceback.format_exc())
 
 
 if __name__ == '__main__':
