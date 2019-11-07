@@ -2,7 +2,7 @@
 # Licensed under GPLv2 or any later version
 # Refer to the license.txt file included.
 
-# pylint: disable=line-too-long, too-many-locals, broad-except, too-many-branches, too-many-statements
+# pylintt: disable=line-too-long, too-many-locals, broad-except, too-many-branches, too-many-statements
 
 """Main file."""
 
