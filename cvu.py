@@ -93,7 +93,7 @@ def main():
 
             tgz.seek(0)
             tar = tarfile.open(fileobj=tgz, mode='r:gz')
-            if installed != None:
+            if installed is not None:
                 disabled = os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
                 if os.path.exists(disabled):
