@@ -23,13 +23,12 @@ import tqdm
 import urllib3
 
 FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
-
-http = urllib3.PoolManager()
+HTTP = urllib3.PoolManager()
 
 def http_get(url, **kwargs):
     """Makes a HTTP GET."""
-    res = http.request('GET', url,
-                       headers={'user-agent': f'Citra Valentin updater on {sys.platform}'}, **kwargs)
+    return HTTP.request('GET', url,
+                        headers={'user-agent': f'Citra Valentin updater on {sys.platform}'}, **kwargs)
 
 def get_json(url, **kwargs):
     """Makes a HTTP GET then returns the parsed JSON."""
