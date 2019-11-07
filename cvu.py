@@ -99,7 +99,8 @@ def show_traceback(exception, formatted_traceback):
     buttons = tkinter.Frame(window)
     tkinter.Button(buttons, text='Copy Traceback',
                    command=copy_traceback).pack(side=tkinter.LEFT)
-    tkinter.Button(buttons, text='New GitHub Issue',
+    tkinter.Button(buttons,
+                   text='New GitHub Issue',
                    command=new_github_issue).pack(side=tkinter.LEFT)
     buttons.pack(side=tkinter.BOTTOM)
     window.mainloop()
