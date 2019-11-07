@@ -25,6 +25,7 @@ HTTP = urllib3.PoolManager()
 INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
     os.getenv('LOCALAPPDATA'), 'citra-valentin'))
 
+
 def http_get(url, **kwargs):
     """Makes a HTTP GET."""
     return HTTP.request('GET', url,
@@ -32,14 +33,17 @@ def http_get(url, **kwargs):
                             'user-agent': f'Citra Valentin updater on {sys.platform}'
                         }, **kwargs)
 
+
 def get_json(url, **kwargs):
     """Makes a HTTP GET then returns the parsed JSON."""
     res = http_get(url, **kwargs)
     return json.loads(res.data.decode('utf8'))
 
+
 def get_releases(**kwargs):
     """Returns the releases for vvanelslande/citra."""
     return get_json('https://api.github.com/repos/vvanelslande/citra/releases', **kwargs)
+
 
 def get_installed_version():
     """Gets the installed Citra Valentin version."""
@@ -68,6 +72,7 @@ def get_installed_version():
             return 'multiple'
 
     return installed
+
 
 def show_traceback(exception, formatted_traceback):
     """Shows a traceback and options to copy it or create a GitHub issue."""
@@ -103,12 +108,14 @@ def show_traceback(exception, formatted_traceback):
     buttons.pack(side=tkinter.BOTTOM)
     window.mainloop()
 
+
 def delete_disabled(installed, disabled):
     """Deletes disabled directory if it already exists."""
     if os.path.exists(disabled):
         print(f'Deleting \'citra-valentin-windows-{installed}-disabled\'')
         print('Because it already exists.')
         shutil.rmtree(disabled)
+
 
 def main():
     """Main function."""
@@ -177,7 +184,7 @@ def main():
             os.path.join(INSTALL_DIR,
                          f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')
         ] + sys.argv[1:])
-    except Exception as exception: # pylint: disable=broad-except
+    except Exception as exception:  # pylint: disable=broad-except
         if installed is not None:
             subprocess.Popen([
                 os.path.join(
