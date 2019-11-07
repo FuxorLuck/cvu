@@ -1,8 +1,10 @@
-"""Main file."""
-
 # Copyright (C) 2019 Valentin Vanelslande
 # Licensed under GPLv2 or any later version
 # Refer to the license.txt file included.
+
+# pylint: disable=line-too-long, too-many-locals, broad-except, too-many-branches, too-many-statements
+
+"""Main file."""
 
 import io
 import json
@@ -21,6 +23,22 @@ import tqdm
 import urllib3
 
 FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
+
+http = urllib3.PoolManager()
+
+def http_get(url, **kwargs):
+    """Makes a HTTP GET."""
+    res = http.request('GET', url,
+                       headers={'user-agent': f'Citra Valentin updater on {sys.platform}'}, **kwargs)
+
+def get_json(url, **kwargs):
+    """Makes a HTTP GET then returns the parsed JSON."""
+    res = http_get(url, **kwargs)
+    return json.loads(res.data.decode('utf8'))
+
+def get_releases(**kwargs):
+    """Returns the releases for vvanelslande/citra."""
+    return get_json('https://api.github.com/repos/vvanelslande/citra/releases', **kwargs)
 
 def main():
     """Main function."""
@@ -52,11 +70,7 @@ def main():
             return
 
     try:
-        http = urllib3.PoolManager()
-
-        res = http.request('GET', 'https://api.github.com/repos/vvanelslande/citra/releases',
-                           headers={'user-agent': f'Citra Valentin updater on {sys.platform}'})
-        releases = json.loads(res.data.decode('utf8'))
+        releases = get_releases()
         latest = None
         tgz_url = None
 
@@ -80,8 +94,7 @@ def main():
         if installed != latest:
             print(f'Installing {latest}...')
 
-            res = http.request('GET', tgz_url, headers={'user-agent': f'Citra Valentin updater on {sys.platform}'}, preload_content=False)
-
+            res = http_get(tgz_url, preload_content=False)
             size = int(res.headers['content-length'])
             progress = tqdm.tqdm(total=size, unit='B', unit_scale=True)
             tgz = io.BytesIO()
