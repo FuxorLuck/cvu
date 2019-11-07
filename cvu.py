@@ -67,20 +67,23 @@ def get_installed_version():
             print('No installed and enabled version found.')
         else:
             subprocess.call(['explorer.exe', INSTALL_DIR])
-            print('Multiple enabled versions found.')
-            print('You can disable versions by adding -disabled to the names.')
-            input()
-            return 'multiple'
+            raise Exception('\n'.join([
+                'Multiple enabled installed versions found.',
+                'Explorer was started.',
+                'To disable a version, add -disabled to it\'s directory name.'
+            ]))
 
     return installed
 
 
 def show_traceback(exception, formatted_traceback):
-    """Shows a traceback and options to copy it or create a GitHub issue."""
+    """Shows a traceback and buttons to copy it or create a GitHub issue."""
     window = tkinter.Tk()
     window.title('cvu')
     window.state('zoomed')
     tkinter.Label(window, text='Something happened').pack()
+    tkinter.Label(window, text='Message:').pack()
+    tkinter.Label(window, text=exception.args[0]).pack()
     tkinter.Label(window, text='Traceback:').pack()
     text = tkinter.Text(window)
     text.insert(tkinter.END, formatted_traceback)
@@ -123,77 +126,9 @@ def main():
 
     print(f'Installation directory: {INSTALL_DIR}')
 
-    installed = get_installed_version()
-    if installed == 'multiple':
-        return
+    installed = None
 
-    try:
-        releases = get_releases()
-        latest = None
-        tgz_url = None
-
-        for release in releases:
-            if latest is not None:
-                break
-
-            for asset in release['assets']:
-                match = re.match(pattern=FILE_NAME_PATTERN,
-                                 string=asset['name'])
-
-                if match is not None:
-                    latest = match.group(1)
-                    tgz_url = asset['browser_download_url']
-
-                    print(' '.join([
-                        f'Latest version: {latest}',
-                        f'(tag name: {release["tag_name"]})'
-                    ]))
-
-                    break
-
-        if installed != latest:
-            print(f'Installing {latest}...')
-
-            res = http_get(tgz_url, preload_content=False)
-            size = int(res.headers['content-length'])
-            progress = tqdm.tqdm(total=size, unit='B', unit_scale=True)
-            tgz = io.BytesIO()
-
-            for data in res:
-                progress.update(len(data))
-                tgz.write(data)
-
-            progress.close()
-
-            tgz.seek(0)
-            tar = tarfile.open(fileobj=tgz, mode='r:gz')
-            if installed is not None:
-                disabled = os.path.join(
-                    INSTALL_DIR,
-                    f'citra-valentin-windows-{installed}-disabled')
-                delete_disabled(installed, disabled)
-                os.rename(os.path.join(
-                    INSTALL_DIR,
-                    f'citra-valentin-windows-{installed}'), disabled)
-                print(f'{installed} was disabled (-disabled suffix added)')
-                if os.path.isdir(os.path.join(disabled, 'user')):
-                    shutil.copytree(
-                        os.path.join(disabled, 'user'),
-                        os.path.join(INSTALL_DIR,
-                                     f'citra-valentin-windows-{latest}',
-                                     'user'))
-                    print(
-                        f'user directory from {installed} copied to {latest}')
-            tar.extractall(INSTALL_DIR)
-        else:
-            print('You have the latest version.')
-
-        subprocess.Popen([
-            os.path.join(INSTALL_DIR,
-                         f'citra-valentin-windows-{latest}',
-                         'citra-valentin-qt.exe')
-        ] + sys.argv[1:])
-    except Exception as exception:  # pylint: disable=broad-except
+    def excepthook(exctype, value, tbk):
         if installed is not None:
             subprocess.Popen([
                 os.path.join(
@@ -203,7 +138,78 @@ def main():
                 )
             ] + sys.argv[1:])
 
-        show_traceback(exception, traceback.format_exc())
+        show_traceback(value, traceback.format_exception(
+            exctype, value, tbk))
+
+    sys.excepthook = excepthook
+
+    installed = get_installed_version()
+
+    releases = get_releases()
+    latest = None
+    tgz_url = None
+
+    for release in releases:
+        if latest is not None:
+            break
+
+        for asset in release['assets']:
+            match = re.match(pattern=FILE_NAME_PATTERN,
+                             string=asset['name'])
+
+            if match is not None:
+                latest = match.group(1)
+                tgz_url = asset['browser_download_url']
+
+                print(' '.join([
+                    f'Latest version: {latest}',
+                    f'(tag name: {release["tag_name"]})'
+                ]))
+
+                break
+
+    if installed != latest:
+        print(f'Installing {latest}...')
+
+        res = http_get(tgz_url, preload_content=False)
+        size = int(res.headers['content-length'])
+        progress = tqdm.tqdm(total=size, unit='B', unit_scale=True)
+        tgz = io.BytesIO()
+
+        for data in res:
+            progress.update(len(data))
+            tgz.write(data)
+
+        progress.close()
+
+        tgz.seek(0)
+        tar = tarfile.open(fileobj=tgz, mode='r:gz')
+        if installed is not None:
+            disabled = os.path.join(
+                INSTALL_DIR,
+                f'citra-valentin-windows-{installed}-disabled')
+            delete_disabled(installed, disabled)
+            os.rename(os.path.join(
+                INSTALL_DIR,
+                f'citra-valentin-windows-{installed}'), disabled)
+            print(f'{installed} was disabled (-disabled suffix added)')
+            if os.path.isdir(os.path.join(disabled, 'user')):
+                shutil.copytree(
+                    os.path.join(disabled, 'user'),
+                    os.path.join(INSTALL_DIR,
+                                 f'citra-valentin-windows-{latest}',
+                                 'user'))
+                print(
+                    f'user directory from {installed} copied to {latest}')
+            tar.extractall(INSTALL_DIR)
+        else:
+            print('You have the latest version.')
+
+    subprocess.Popen([
+        os.path.join(INSTALL_DIR,
+                     f'citra-valentin-windows-{latest}',
+                     'citra-valentin-qt.exe')
+    ] + sys.argv[1:])
 
 
 if __name__ == '__main__':
