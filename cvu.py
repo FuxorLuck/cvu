@@ -22,20 +22,20 @@ import urllib3
 
 FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
 
-
 def main():
-    INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
+    """Main function."""
+    install_dir = os.getenv('CVU_INSTALL_DIR', os.path.join(
         os.getenv('LOCALAPPDATA'), 'citra-valentin'))
 
-    print(f'Installation directory: {INSTALL_DIR}')
+    print(f'Installation directory: {install_dir}')
 
     installed = None
 
-    if not os.path.exists(INSTALL_DIR):
-        os.mkdir(INSTALL_DIR)
+    if not os.path.exists(install_dir):
+        os.mkdir(install_dir)
     else:
         enabled = list(
-            filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(INSTALL_DIR)))
+            filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(install_dir)))
 
         if len(enabled) == 1:
             installed = re.match(pattern='citra-valentin-windows-(.*)',
@@ -45,7 +45,7 @@ def main():
         elif len(enabled) == 0:
             print('No installed and enabled version found.')
         else:
-            subprocess.call(['explorer.exe', INSTALL_DIR])
+            subprocess.call(['explorer.exe', install_dir])
             print(
                 'Multiple enabled versions found. You can disable versions by adding -disabled to the names.')
             input()
@@ -96,31 +96,31 @@ def main():
             tar = tarfile.open(fileobj=tgz, mode='r:gz')
             if installed is not None:
                 disabled = os.path.join(
-                    INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
+                    install_dir, f'citra-valentin-windows-{installed}-disabled')
                 if os.path.exists(disabled):
                     print(
                         f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.')
                     shutil.rmtree(disabled)
                 os.rename(os.path.join(
-                    INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
+                    install_dir, f'citra-valentin-windows-{installed}'), disabled)
                 print(f'{installed} was disabled (-disabled suffix added)')
                 if os.path.isdir(os.path.join(disabled, 'user')):
                     shutil.copytree(os.path.join(disabled, 'user'), os.path.join(
-                        INSTALL_DIR, f'citra-valentin-windows-{latest}', 'user'))
+                        install_dir, f'citra-valentin-windows-{latest}', 'user'))
                     print(
                         f'user directory from {installed} copied to {latest}')
-            tar.extractall(INSTALL_DIR)
+            tar.extractall(install_dir)
         else:
             print('You have the latest version.')
 
         args = [os.path.join(
-            INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+            install_dir, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
 
         subprocess.Popen(args)
     except Exception as exception:
         if installed is not None:
             args = [os.path.join(
-                INSTALL_DIR, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+                install_dir, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
 
             subprocess.Popen(args)
 
