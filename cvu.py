@@ -2,8 +2,6 @@
 # Licensed under GPLv2 or any later version
 # Refer to the license.txt file included.
 
-# pylintt: disable=line-too-long, too-many-locals, broad-except, too-many-branches, too-many-statements
-
 """Main file."""
 
 import io
@@ -179,7 +177,7 @@ def main():
             os.path.join(INSTALL_DIR,
                          f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')
         ] + sys.argv[1:])
-    except Exception as exception:
+    except Exception as exception: # pylint: disable=broad-except
         if installed is not None:
             subprocess.Popen([
                 os.path.join(
