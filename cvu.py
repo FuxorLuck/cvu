@@ -177,10 +177,13 @@ def main():
         subprocess.Popen(args)
     except Exception as exception:
         if installed is not None:
-            args = [os.path.join(
-                INSTALL_DIR, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
-
-            subprocess.Popen(args)
+            subprocess.Popen([
+                os.path.join(
+                    INSTALL_DIR,
+                    f'citra-valentin-windows-{installed}',
+                    'citra-valentin-qt.exe'
+                )
+            ] + sys.argv[1:])
 
         show_traceback(exception, traceback.format_exc())
 
