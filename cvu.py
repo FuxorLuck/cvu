@@ -46,7 +46,7 @@ def get_releases(**kwargs):
 def get_installed_version():
     """Gets the installed Citra Valentin version."""
     installed = None
-    
+
     if not os.path.exists(INSTALL_DIR):
         os.mkdir(INSTALL_DIR)
     else:
@@ -64,8 +64,8 @@ def get_installed_version():
             print('No installed and enabled version found.')
         else:
             subprocess.call(['explorer.exe', INSTALL_DIR])
-            print(
-                'Multiple enabled versions found. You can disable versions by adding -disabled to the names.')
+            print('Multiple enabled versions found.')
+            print('You can disable versions by adding -disabled to the names.')
             input()
             return 'multiple'
 
@@ -156,9 +156,8 @@ def main():
                 disabled = os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
                 if os.path.exists(disabled):
-                    print(
-                        f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.'
-                    )
+                    print(f'Directory \'citra-valentin-windows-{installed}-disabled\' exists,')
+                    print('Deleting it.')
                     shutil.rmtree(disabled)
                 os.rename(os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
@@ -172,10 +171,9 @@ def main():
         else:
             print('You have the latest version.')
 
-        args = [os.path.join(
-            INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
-
-        subprocess.Popen(args)
+        subprocess.Popen([
+            os.path.join(INSTALL_DIR,
+                         f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:])
     except Exception as exception:
         if installed is not None:
             subprocess.Popen([
