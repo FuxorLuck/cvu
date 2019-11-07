@@ -182,7 +182,8 @@ def main():
 
         subprocess.Popen([
             os.path.join(INSTALL_DIR,
-                         f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')
+                         f'citra-valentin-windows-{latest}',
+                         'citra-valentin-qt.exe')
         ] + sys.argv[1:])
     except Exception as exception:  # pylint: disable=broad-except
         if installed is not None:
