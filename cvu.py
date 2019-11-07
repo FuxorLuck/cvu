@@ -30,7 +30,9 @@ INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
 def http_get(url, **kwargs):
     """Makes a HTTP GET."""
     return HTTP.request('GET', url,
-                        headers={'user-agent': f'Citra Valentin updater on {sys.platform}'}, **kwargs)
+                        headers={
+                            'user-agent': f'Citra Valentin updater on {sys.platform}'
+                        }, **kwargs)
 
 def get_json(url, **kwargs):
     """Makes a HTTP GET then returns the parsed JSON."""
@@ -49,7 +51,9 @@ def get_installed_version():
         os.mkdir(INSTALL_DIR)
     else:
         enabled = list(
-            filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(INSTALL_DIR)))
+            filter(lambda n: n.startswith('citra-valentin-windows-')
+                   and not n.endswith('-disabled'),
+                   os.listdir(INSTALL_DIR)))
 
         if len(enabled) == 1:
             installed = re.match(pattern='citra-valentin-windows-(.*)',
@@ -152,7 +156,8 @@ def main():
                     INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
                 if os.path.exists(disabled):
                     print(
-                        f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.')
+                        f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.'
+                    )
                     shutil.rmtree(disabled)
                 os.rename(os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
