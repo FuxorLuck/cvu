@@ -13,12 +13,6 @@ jobs:
           pip install -r requirements.txt
           pip install PyInstaller
         displayName: 'Install dependencies'
-      - powershell: |
-          Get-ChildItem -Path ** -Recurse *.py | foreach { pylint $_.FullName }
-        displayName: 'Pylint'
-      - script: |
-          pycodestyle .
-        displayName: 'pycodestyle'
       - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
         displayName: 'Generate exe file'
       - task: CopyFiles@2
