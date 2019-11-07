@@ -90,7 +90,7 @@ def main():
                 progress.update(len(data))
                 tgz.write(data)
 
-            t.close()
+            progress.close()
 
             tgz.seek(0)
             tar = tarfile.open(fileobj=tgz, mode='r:gz')
