@@ -1,71 +1,55 @@
-jobs:
-  - job: Build
-    pool:
-      vmImage: 'windows-2019'
-    steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7.4'
-          addToPath: true
-          architecture: 'x64'
-      - script: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install PyInstaller
-        displayName: 'Install dependencies'
-      - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
-        displayName: 'Generate exe file'
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: '.'
-          Contents: 'license.txt'
-          TargetFolder: 'dist'
-      - powershell: |
-          iscc /dMyAppVersion="$(Build.SourceVersion)" cvu.iss
-        displayName: 'Generate setup'
-      - task: ArchiveFiles@2
-        inputs:
-          rootFolderOrFile: 'dist'
-          includeRootFolder: false
-          archiveType: 'zip'
-          archiveFile: 'Output/cvu.zip'
-          replaceExistingArchive: true
-      - task: PublishPipelineArtifact@1
-        inputs:
-          targetPath: 'Output'
-          artifact: 'artifacts'
-          publishLocation: 'pipeline'
-      - task: GitHubRelease@1
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        inputs:
-          gitHubConnection: 'GitHub Releases'
-          repositoryName: '$(Build.Repository.Name)'
-          action: 'create'
-          target: '$(Build.SourceVersion)'
-          tagSource: 'userSpecifiedTag'
-          tag: '$(Build.SourceBranchName)-$(Build.SourceVersion)'
-          assets: 'Output/*'
-          changeLogCompareToRelease: 'lastFullRelease'
-          changeLogType: 'commitBased'
-  - job: Checks
-    pool:
-      vmImage: 'windows-2019'
-    steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7.4'
-          addToPath: true
-          architecture: 'x64'
-      - script: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pylint pycodestyle
-        displayName: 'Install dependencies'
-      - powershell: |
-          Get-ChildItem -Path ** -Recurse *.py | foreach { pylint $_.FullName }
-        condition: always()
-        displayName: 'Pylint'
-      - script: |
-          pycodestyle .
-        condition: always()
-        displayName: 'pycodestyle'
+pool:
+  vmImage: 'windows-2019'
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7.4'
+      addToPath: true
+      architecture: 'x64'
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install PyInstaller pylint pycodestyle
+    displayName: 'Install dependencies'
+  - powershell: |
+      Get-ChildItem -Path ** -Recurse *.py | foreach { pylint $_.FullName }
+    condition: always()
+    displayName: 'Pylint'
+  - script: |
+      pycodestyle .
+    condition: always()
+    displayName: 'pycodestyle'
+  - script: python -m PyInstaller --onefile --icon citra.ico cvu.py
+    displayName: 'Generate exe file'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '.'
+      Contents: 'license.txt'
+      TargetFolder: 'dist'
+  - powershell: |
+      iscc /dMyAppVersion="$(Build.SourceVersion)" cvu.iss
+    displayName: 'Generate setup'
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: 'dist'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: 'Output/cvu.zip'
+      replaceExistingArchive: true
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: 'Output'
+      artifact: 'artifacts'
+      publishLocation: 'pipeline'
+  - task: GitHubRelease@1
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    inputs:
+      gitHubConnection: 'GitHub Releases'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'userSpecifiedTag'
+      tag: '$(Build.SourceBranchName)-$(Build.SourceVersion)'
+      assets: 'Output/*'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
