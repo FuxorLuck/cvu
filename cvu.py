@@ -28,10 +28,9 @@ INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
 
 def http_get(url, **kwargs):
     """Makes a HTTP GET."""
-    return HTTP.request('GET', url,
-                        headers={
-                            'user-agent': f'Citra Valentin updater on {sys.platform}'
-                        }, **kwargs)
+    return HTTP.request('GET', url, headers={
+        'user-agent': f'Citra Valentin updater on {sys.platform}'
+    }, **kwargs)
 
 
 def get_json(url, **kwargs):
@@ -42,7 +41,9 @@ def get_json(url, **kwargs):
 
 def get_releases(**kwargs):
     """Returns the releases for vvanelslande/citra."""
-    return get_json('https://api.github.com/repos/vvanelslande/citra/releases', **kwargs)
+    return get_json(
+        'https://api.github.com/repos/vvanelslande/citra/releases',
+        **kwargs)
 
 
 def get_installed_version():
@@ -143,8 +144,10 @@ def main():
                     latest = match.group(1)
                     tgz_url = asset['browser_download_url']
 
-                    print(
-                        f'Latest version: {latest} (tag name: {release["tag_name"]})')
+                    print(' '.join([
+                        f'Latest version: {latest}',
+                        f'(tag name: {release["tag_name"]})'
+                    ]))
 
                     break
 
@@ -165,15 +168,19 @@ def main():
             tgz.seek(0)
             tar = tarfile.open(fileobj=tgz, mode='r:gz')
             if installed is not None:
-                disabled = os.path.join(
-                    INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
+                disabled = os.path.join(INSTALL_DIR,
+                    f'citra-valentin-windows-{installed}-disabled')
                 delete_disabled(installed, disabled)
                 os.rename(os.path.join(
-                    INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
+                    INSTALL_DIR,
+                    f'citra-valentin-windows-{installed}'), disabled)
                 print(f'{installed} was disabled (-disabled suffix added)')
                 if os.path.isdir(os.path.join(disabled, 'user')):
-                    shutil.copytree(os.path.join(disabled, 'user'), os.path.join(
-                        INSTALL_DIR, f'citra-valentin-windows-{latest}', 'user'))
+                    shutil.copytree(
+                        os.path.join(disabled, 'user'),
+                        os.path.join(INSTALL_DIR,
+                                     f'citra-valentin-windows-{latest}',
+                                     'user'))
                     print(
                         f'user directory from {installed} copied to {latest}')
             tar.extractall(INSTALL_DIR)
