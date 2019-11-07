@@ -82,8 +82,6 @@ def show_traceback(exception, formatted_traceback):
     window.title('cvu')
     window.state('zoomed')
     tkinter.Label(window, text='Something happened').pack()
-    tkinter.Label(window, text='Message:').pack()
-    tkinter.Label(window, text=exception.args[0]).pack()
     tkinter.Label(window, text='Traceback:').pack()
     text = tkinter.Text(window)
     text.insert(tkinter.END, formatted_traceback)
