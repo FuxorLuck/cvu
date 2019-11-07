@@ -24,6 +24,8 @@ import urllib3
 
 FILE_NAME_PATTERN = 'citra-valentin-windows-(.*).tar.gz'
 HTTP = urllib3.PoolManager()
+INSTALL_DIR = os.getenv('CVU_INSTALL_DIR', os.path.join(
+    os.getenv('LOCALAPPDATA'), 'citra-valentin'))
 
 def http_get(url, **kwargs):
     """Makes a HTTP GET."""
@@ -39,20 +41,15 @@ def get_releases(**kwargs):
     """Returns the releases for vvanelslande/citra."""
     return get_json('https://api.github.com/repos/vvanelslande/citra/releases', **kwargs)
 
-def main():
-    """Main function."""
-    install_dir = os.getenv('CVU_INSTALL_DIR', os.path.join(
-        os.getenv('LOCALAPPDATA'), 'citra-valentin'))
-
-    print(f'Installation directory: {install_dir}')
-
+def get_installed_version():
+    """Gets the installed Citra Valentin version."""
     installed = None
-
-    if not os.path.exists(install_dir):
-        os.mkdir(install_dir)
+    
+    if not os.path.exists(INSTALL_DIR):
+        os.mkdir(INSTALL_DIR)
     else:
         enabled = list(
-            filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(install_dir)))
+            filter(lambda n: n.startswith('citra-valentin-windows-') and not n.endswith('-disabled'), os.listdir(INSTALL_DIR)))
 
         if len(enabled) == 1:
             installed = re.match(pattern='citra-valentin-windows-(.*)',
@@ -62,11 +59,22 @@ def main():
         elif len(enabled) == 0:
             print('No installed and enabled version found.')
         else:
-            subprocess.call(['explorer.exe', install_dir])
+            subprocess.call(['explorer.exe', INSTALL_DIR])
             print(
                 'Multiple enabled versions found. You can disable versions by adding -disabled to the names.')
             input()
-            return
+            return 'multiple'
+
+    return installed
+
+def main():
+    """Main function."""
+
+    print(f'Installation directory: {INSTALL_DIR}')
+
+    installed = get_installed_version()
+    if installed == 'multiple':
+        return
 
     try:
         releases = get_releases()
@@ -108,31 +116,31 @@ def main():
             tar = tarfile.open(fileobj=tgz, mode='r:gz')
             if installed is not None:
                 disabled = os.path.join(
-                    install_dir, f'citra-valentin-windows-{installed}-disabled')
+                    INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
                 if os.path.exists(disabled):
                     print(
                         f'Directory \'citra-valentin-windows-{installed}-disabled\' already exists, deleting it.')
                     shutil.rmtree(disabled)
                 os.rename(os.path.join(
-                    install_dir, f'citra-valentin-windows-{installed}'), disabled)
+                    INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
                 print(f'{installed} was disabled (-disabled suffix added)')
                 if os.path.isdir(os.path.join(disabled, 'user')):
                     shutil.copytree(os.path.join(disabled, 'user'), os.path.join(
-                        install_dir, f'citra-valentin-windows-{latest}', 'user'))
+                        INSTALL_DIR, f'citra-valentin-windows-{latest}', 'user'))
                     print(
                         f'user directory from {installed} copied to {latest}')
-            tar.extractall(install_dir)
+            tar.extractall(INSTALL_DIR)
         else:
             print('You have the latest version.')
 
         args = [os.path.join(
-            install_dir, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+            INSTALL_DIR, f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:]
 
         subprocess.Popen(args)
     except Exception as exception:
         if installed is not None:
             args = [os.path.join(
-                install_dir, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
+                INSTALL_DIR, f'citra-valentin-windows-{installed}', 'citra-valentin-qt.exe')] + sys.argv[1:]
 
             subprocess.Popen(args)
 
