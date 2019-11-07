@@ -1,3 +1,6 @@
+variables:
+  PYTHON_VERSION: '3.7.4'
+
 jobs:
   - job: Build
     pool:
@@ -5,7 +8,7 @@ jobs:
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: '3.7.4'
+          versionSpec: '$(PYTHON_VERSION)'
           addToPath: true
           architecture: 'x64'
       - script: |
@@ -47,25 +50,37 @@ jobs:
           assets: 'Output/*'
           changeLogCompareToRelease: 'lastFullRelease'
           changeLogType: 'commitBased'
-  - job: Checks
+  - job: Pylint
     pool:
       vmImage: 'windows-2019'
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: '3.7.4'
+          versionSpec: '$(PYTHON_VERSION)'
           addToPath: true
           architecture: 'x64'
       - script: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pylint pycodestyle
+          pip install pylint
         displayName: 'Install dependencies'
       - powershell: |
           Get-ChildItem -Path ** -Recurse *.py | foreach { pylint $_.FullName }
-        condition: always()
         displayName: 'Pylint'
+  - job: Pycodestyle
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(PYTHON_VERSION)'
+          addToPath: true
+          architecture: 'x64'
+      - script: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pycodestyle
+        displayName: 'Install dependencies'
       - script: |
           pycodestyle .
-        condition: always()
         displayName: 'pycodestyle'
