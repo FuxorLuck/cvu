@@ -105,6 +105,13 @@ def show_traceback(exception, formatted_traceback):
     buttons.pack(side=tkinter.BOTTOM)
     window.mainloop()
 
+def delete_disabled(installed, disabled):
+    """Deletes disabled directory if it already exists."""
+    if os.path.exists(disabled):
+        print(f'Deleting \'citra-valentin-windows-{installed}-disabled\'')
+        print('Because it already exists.')
+        shutil.rmtree(disabled)
+
 def main():
     """Main function."""
 
@@ -155,10 +162,7 @@ def main():
             if installed is not None:
                 disabled = os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}-disabled')
-                if os.path.exists(disabled):
-                    print(f'Directory \'citra-valentin-windows-{installed}-disabled\' exists,')
-                    print('Deleting it.')
-                    shutil.rmtree(disabled)
+                delete_disabled(installed, disabled)
                 os.rename(os.path.join(
                     INSTALL_DIR, f'citra-valentin-windows-{installed}'), disabled)
                 print(f'{installed} was disabled (-disabled suffix added)')
@@ -173,7 +177,8 @@ def main():
 
         subprocess.Popen([
             os.path.join(INSTALL_DIR,
-                         f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')] + sys.argv[1:])
+                         f'citra-valentin-windows-{latest}', 'citra-valentin-qt.exe')
+        ] + sys.argv[1:])
     except Exception as exception:
         if installed is not None:
             subprocess.Popen([
