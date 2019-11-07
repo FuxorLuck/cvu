@@ -201,9 +201,9 @@ def main():
                                  'user'))
                 print(
                     f'user directory from {installed} copied to {latest}')
-            tar.extractall(INSTALL_DIR)
-        else:
-            print('You have the latest version.')
+        tar.extractall(INSTALL_DIR)
+    else:
+        print('You have the latest version.')
 
     subprocess.Popen([
         os.path.join(INSTALL_DIR,
