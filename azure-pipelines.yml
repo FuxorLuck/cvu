@@ -23,6 +23,7 @@ jobs:
           SourceFolder: '.'
           Contents: 'license.txt'
           TargetFolder: 'dist'
+        displayName: 'Copy license.txt'
       - powershell: |
           iscc /dMyAppVersion="$(Build.SourceVersion)" cvu.iss
         displayName: 'Generate setup'
