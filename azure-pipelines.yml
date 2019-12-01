@@ -1,5 +1,6 @@
 variables:
   PYTHON_VERSION: '3.7.5'
+  CVU_VERSION: '1.0.0'
 
 jobs:
   - job: Build
@@ -25,7 +26,7 @@ jobs:
           TargetFolder: 'dist'
         displayName: 'Copy license.txt'
       - powershell: |
-          iscc /dMyAppVersion="$(Build.SourceVersion)" cvu.iss
+          iscc /dMyAppVersion="$(CVU_VERSION)" cvu.iss
         displayName: 'Generate setup'
       - task: ArchiveFiles@2
         inputs:
@@ -84,4 +85,4 @@ jobs:
         displayName: 'Install dependencies'
       - script: |
           pycodestyle .
-        displayName: 'pycodestyle'
+        displayName: 'Pycodestyle'
